@@ -58,7 +58,6 @@ const PokemonView = ({ navigation, route }: Props) => {
 		const team = await getMyTeam();
 		if (team.length > 0) {
 			const actualPoints = team[0].teamPoints! + sumPokemonPoints;
-			console.log(actualPoints + ' <= ' + myPoints);
 			if (actualPoints <= myPoints) {
 				team[0].teamPoints = actualPoints;
 				await AsyncStorage.setItem(
@@ -136,9 +135,14 @@ const PokemonView = ({ navigation, route }: Props) => {
 						{name + '\n'} # {id}
 					</Text>
 					<TouchableOpacity
-						style={{ top: Platform.OS === 'ios' ? 20 : 0 }}
+						style={{ top: Platform.OS === 'ios' ? 20 : 5 }}
 						onPress={removed ? removePokemonHandle : addPokemonHandle}>
-						<View style={styles.containerAddButton}>
+						<View
+							style={
+								Platform.OS === 'ios'
+									? { ...styles.containerAddButtonIos }
+									: { ...styles.containerAddButtonAndroid, borderRadius: 100 }
+							}>
 							{removed ? (
 								<Icon name="remove-circle-sharp" size={33} color="#cb0000" />
 							) : (
@@ -199,10 +203,8 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center'
 	},
-	containerAddButton: {
-		top: Platform.OS === 'ios' ? 2 : -2,
-		backgroundColor: 'rgba(255,255,255,0)',
-		borderRadius: 100,
+	containerAddButtonIos: {
+		top: Platform.OS === 'ios' ? 2 : 3,
 		shadowColor: '#000',
 		shadowOffset: {
 			width: 0,
@@ -212,5 +214,12 @@ const styles = StyleSheet.create({
 		shadowRadius: 9.51,
 
 		elevation: 15
+	},
+	containerAddButtonAndroid: {
+		top: Platform.OS === 'ios' ? 2 : 3,
+		shadowOffset: { width: 10, height: 20 },
+		shadowColor: 'rgba(0,0,0,0.5)',
+		shadowOpacity: 1,
+		elevation: 3
 	}
 });

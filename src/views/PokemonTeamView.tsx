@@ -1,18 +1,10 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
-import { Text, View, StyleSheet, Image, Dimensions, ActivityIndicator, Platform, FlatList } from 'react-native';
-import { StackScreenProps } from '@react-navigation/stack';
+import React, { useEffect, useState } from 'react';
+import { Text, View, StyleSheet, Image, Dimensions, Platform, FlatList } from 'react-native';
 import { globalStyles } from '../theme/appTheme';
 import { FadeInImage } from '../components/FadeInImage';
-import { getPokemonInformation } from '../hooks/pokemonInformation';
-import PokemonDetail from '../components/PokemonDetail';
-import { RootStackParams } from '../types/globalTypes';
-import { getPokemon } from '../hooks/getPokemon';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { SimplePokemon, Characteristics, Region } from '../interfaces/pokemonInterfaces';
+import { SimplePokemon } from '../interfaces/pokemonInterfaces';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PokemonCards from '../components/PokemonCards';
-import CharacteristicsByTypes from '../components/CharacteristicsByTypes';
 import { useIsFocused } from '@react-navigation/native';
 
 interface Averages {
@@ -27,7 +19,6 @@ interface TempRegions {
 
 const PokemonTeamView = () => {
 	const [team, setTeam] = useState<SimplePokemon[]>([]);
-	console.log('aaaaa');
 	const width = Dimensions.get('window').width;
 	const [averagesPokemon, setAveragesPokemon] = useState<Averages[]>([]);
 	const [regionsPokemon, setRegionsPokemon] = useState<TempRegions[]>([]);
@@ -72,9 +63,6 @@ const PokemonTeamView = () => {
 				}
 			});
 			const teamFiltered = tempRegions.filter((value, index, self) => {
-				console.log(value);
-				console.log(self.findIndex(t => t.name === value.name));
-				console.log(index);
 				return index === self.findIndex(t => t.name === value.name);
 			});
 			setTotal(subTotal);
@@ -83,22 +71,6 @@ const PokemonTeamView = () => {
 			setAveragesPokemon(temp);
 			setRegionsPokemon(teamFiltered);
 		}
-		// const teamFiltered = regionsPokemon.filter((value, index, self) => {
-		// 	console.log(value);
-		// 	console.log(self.findIndex(t => t.name === value.name));
-		// 	console.log(index);
-		// 	return index === self.findIndex(t => t.name === value.name);
-		// });
-
-		// console.log('tempRegions', regionsPokemon);
-		// setRegionsPokemon(teamFiltered);
-		// const teamFiltered = regionsPokemon.filter((value, index, self) => {
-		// 	console.log(value);
-		// 	console.log(self.findIndex(t => t.name === value.name));
-		// 	console.log(index);
-		// 	return index === self.findIndex(t => t.name === value.name);
-		// });
-		// console.log('tempregions', teamFiltered);
 	};
 
 	const EmptyResult = () => {
@@ -111,7 +83,7 @@ const PokemonTeamView = () => {
 
 	const ListHeader = () => {
 		return (
-			<View style={{ marginTop: Platform.OS === 'ios' ? 270 : 0, alignItems: 'center' }}>
+			<View style={{ marginTop: Platform.OS === 'ios' ? 270 : 260, alignItems: 'center' }}>
 				{averagesPokemon.length > 0 && (
 					<Text
 						style={{
@@ -182,7 +154,7 @@ const PokemonTeamView = () => {
 					...styles.headerContainer,
 					backgroundColor: '#1e8dd8',
 					justifyContent: 'center',
-					height: Platform.OS === 'ios' ? 320 : 380,
+					height: Platform.OS === 'ios' ? 320 : 300,
 					paddingTop: Platform.OS === 'ios' ? 80 : 60
 				}}>
 				<View style={{ ...globalStyles.contentRow, width: width * 0.6 }}>
@@ -190,7 +162,7 @@ const PokemonTeamView = () => {
 						style={{
 							...styles.pokemonName,
 							...globalStyles.capitalize,
-							top: Platform.OS === 'ios' ? -45 : 0
+							top: Platform.OS === 'ios' ? -45 : -65
 						}}>
 						My Team
 					</Text>
@@ -265,10 +237,12 @@ const styles = StyleSheet.create({
 	headerTable: {
 		textAlign: 'center',
 		fontSize: 20,
-		fontWeight: '700'
+		fontWeight: '700',
+		color: 'black'
 	},
 	contentTable: {
 		fontSize: 16,
-		fontWeight: '500'
+		fontWeight: '500',
+		color: 'black'
 	}
 });

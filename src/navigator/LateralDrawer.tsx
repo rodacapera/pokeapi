@@ -3,17 +3,17 @@ import {
 	DrawerContentComponentProps,
 	DrawerContentScrollView,
 	DrawerItem,
-	DrawerItemList,
+	DrawerItemList
 } from '@react-navigation/drawer';
 import StackNavigatorTabs from './StackNavigatorTabs';
-import {Image, Linking, Text, useWindowDimensions, View} from 'react-native';
-import {globalStyles, drawerStyles} from '../theme/appTheme';
+import { Image, Linking, Text, useWindowDimensions, View } from 'react-native';
+import { globalStyles, drawerStyles } from '../theme/appTheme';
 import OtherView from '../views/OtherView';
 
 const Drawer = createDrawerNavigator();
 
 export const LateralDrawer = () => {
-	const {width} = useWindowDimensions();
+	const { width } = useWindowDimensions();
 	return (
 		<Drawer.Navigator
 			screenOptions={{
@@ -23,21 +23,21 @@ export const LateralDrawer = () => {
 				headerStyle: {
 					borderWidth: 0,
 					elevation: 0,
-					shadowOpacity: 0,
+					shadowOpacity: 0
 				},
 				headerShown: false, // this remove header
-				drawerHideStatusBarOnOpen: true,
+				drawerHideStatusBarOnOpen: true
 				// overlayColor: 'transparent',
 			}}
 			drawerContent={props => <DrawerComponent {...props} />}>
-			<Drawer.Screen name="StackNavigatorTabs" options={{title: 'Home'}} component={StackNavigatorTabs} />
-			<Drawer.Screen
+			<Drawer.Screen name="StackNavigatorTabs" options={{ title: 'Home' }} component={StackNavigatorTabs} />
+			{/* <Drawer.Screen
 				name="OtherView"
 				options={{
-					title: 'other',
+					title: 'other'
 				}}
 				component={OtherView}
-			/>
+			/> */}
 		</Drawer.Navigator>
 	);
 };
@@ -48,7 +48,7 @@ const DrawerComponent = (props: DrawerContentComponentProps) => {
 			<View style={drawerStyles.contentCenterImage}>
 				<Image
 					source={{
-						uri: 'https://pic.onlinewebfonts.com/svg/img_264157.png',
+						uri: 'https://pic.onlinewebfonts.com/svg/img_264157.png'
 					}}
 					style={drawerStyles.drawerImage}
 				/>
@@ -57,7 +57,7 @@ const DrawerComponent = (props: DrawerContentComponentProps) => {
 				</View>
 			</View>
 			<DrawerItemList {...props} />
-			<DrawerItem label="Help" onPress={() => Linking.openURL('https://mywebsite.com/help')} />
+			{/* <DrawerItem label="Help" onPress={() => Linking.openURL('https://mywebsite.com/help')} /> */}
 		</DrawerContentScrollView>
 	);
 };
