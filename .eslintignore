@@ -1,0 +1,13 @@
+# dependencies
+node_modules/
+.yarnd/
+
+# production
+android/
+ios/
+.bundle/
+
+# ide
+.vscode/
+
+# external docs
