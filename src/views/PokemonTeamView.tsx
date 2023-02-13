@@ -25,10 +25,19 @@ const PokemonTeamView = () => {
 	const [count, setCount] = useState(0);
 	const [total, setTotal] = useState(0);
 	const isFocused = useIsFocused();
+	// const getMyTeam = async () => {
+	// 	const currentTeam = await AsyncStorage.getItem('@storage_Key');
+	// 	const myTeam: SimplePokemon[] = currentTeam ? JSON.parse(currentTeam) : [];
+
+	// };
 	const getMyTeam = async () => {
-		const currentTeam = await AsyncStorage.getItem('@storage_Key');
-		const myTeam: SimplePokemon[] = currentTeam ? JSON.parse(currentTeam) : [];
-		statsAverages(myTeam);
+		const team = await AsyncStorage.getItem('@storage_Key');
+		if (team) {
+			const teamParsed = JSON.parse(team);
+			const teamReturn: SimplePokemon[] = teamParsed;
+			setTeam(teamReturn);
+			statsAverages(teamReturn);
+		}
 	};
 
 	const statsAverages = (myTeam: SimplePokemon[]) => {
@@ -67,7 +76,6 @@ const PokemonTeamView = () => {
 			});
 			setTotal(subTotal);
 			setCount(counter);
-			setTeam(myTeam);
 			setAveragesPokemon(temp);
 			setRegionsPokemon(teamFiltered);
 		}

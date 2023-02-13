@@ -12,7 +12,6 @@ interface Props {
 
 const PokemonDetail = ({ pokemon, pokemonPoints }: Props) => {
 	const { characteristics, regions } = pokemon;
-	console.log(regions.length);
 
 	return (
 		<ScrollView style={{ ...StyleSheet.absoluteFillObject, marginTop: 50 }}>

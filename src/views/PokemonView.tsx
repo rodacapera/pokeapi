@@ -21,27 +21,38 @@ const PokemonView = ({ navigation, route }: Props) => {
 	const [showRemovedModal, setShowRemovedModal] = useState(false);
 	const [added, setAdded] = useState(false);
 	const [removed, setRemoved] = useState(false);
-	const [sumPokemonPoints, setSumPokemonPoints] = useState(0);
+	const [pokemonPoints, setPokemonPoints] = useState(0);
 	const [teamPoints, setTeamPoints] = useState(0);
 	const [warningPoints, setWarningPoints] = useState(false);
+	const [reset, setReset] = useState(false);
 	const width = Dimensions.get('window').width;
 	const myPoints = 3000;
 
 	const getMyTeam = async () => {
 		const team = await AsyncStorage.getItem('@storage_Key');
-		return (team ? JSON.parse(team) : []) as SimplePokemon[];
+		if (team) {
+			const teamParsed = JSON.parse(team);
+			const teamReturn: SimplePokemon[] = teamParsed;
+			return teamReturn;
+		} else {
+			return [];
+		}
 	};
 
 	const removePokemonHandle = async () => {
-		const team = await getMyTeam();
-		const newPoints = teamPoints - sumPokemonPoints;
-		team[0].teamPoints = newPoints;
-		const teamFiltered = team.filter(value => value.name !== simplePokemon.name);
-		await AsyncStorage.setItem('@storage_Key', JSON.stringify(teamFiltered));
+		setShowRemovedModal(true);
 		setAdded(false);
 		setRemoved(false);
-		setShowRemovedModal(true);
-		setTeamPoints(newPoints);
+		const team = await getMyTeam();
+		if (team && team.length > 0) {
+			const newPoints = team[0].teamPoints! - pokemonPoints;
+			team.map((teamValue, index) => {
+				teamValue.teamPoints = newPoints;
+			});
+			const teamFiltered = team.filter(value => value.name !== simplePokemon.name);
+			await AsyncStorage.setItem('@storage_Key', JSON.stringify(teamFiltered));
+			setTeamPoints(newPoints);
+		}
 	};
 
 	// const isDuplicated = async () => {
@@ -55,32 +66,34 @@ const PokemonView = ({ navigation, route }: Props) => {
 	// };
 
 	const addPokemonHandle = async () => {
+		setRemoved(true);
+
 		const team = await getMyTeam();
 		if (team.length > 0) {
-			const actualPoints = team[0].teamPoints! + sumPokemonPoints;
+			const actualPoints = team[0].teamPoints! + pokemonPoints;
 			if (actualPoints <= myPoints) {
-				team[0].teamPoints = actualPoints;
+				team.map((teamValue, index) => {
+					teamValue.teamPoints = actualPoints;
+				});
 				await AsyncStorage.setItem(
 					'@storage_Key',
 					JSON.stringify([...team, { detail: pokemonInformation, color, ...simplePokemon, teamPoints: actualPoints }])
 				);
 				setTeamPoints(actualPoints);
-				setAdded(true);
-				setRemoved(true);
 				setWarningPoints(false);
+				setAdded(true);
 			} else {
 				setWarningPoints(true);
 			}
 		} else {
-			const actualPoints = teamPoints + sumPokemonPoints;
+			const actualPoints = teamPoints + pokemonPoints;
 			await AsyncStorage.setItem(
 				'@storage_Key',
 				JSON.stringify([{ detail: pokemonInformation, color, ...simplePokemon, teamPoints: actualPoints }])
 			);
 			setTeamPoints(actualPoints);
-			setAdded(true);
-			setRemoved(true);
 			setWarningPoints(false);
+			setAdded(true);
 		}
 	};
 
@@ -88,32 +101,41 @@ const PokemonView = ({ navigation, route }: Props) => {
 		const team = await getMyTeam();
 		if (team.length > 0) {
 			const isIn = team.findIndex(t => t.name === simplePokemon.name);
-			isIn === -1 ? setRemoved(false) : setRemoved(true);
+			if (isIn === -1) {
+				setRemoved(false);
+			} else {
+				setRemoved(true);
+			}
+			const actualPoints = team[0].teamPoints;
+			actualPoints && setTeamPoints(actualPoints);
 		} else {
 			setRemoved(false);
 		}
 	};
 
 	const createInitialTeam = async () => {
-		// await AsyncStorage.clear();
-		const team = await AsyncStorage.getItem('@storage_Key');
-		if (!team) await AsyncStorage.setItem('@storage_Key', JSON.stringify([]));
+		const team = await getMyTeam();
 		isInTeam();
+		if (!team) await AsyncStorage.setItem('@storage_Key', JSON.stringify([]));
+	};
+
+	const resetHandle = () => {
+		setReset(true);
+		setTimeout(() => {
+			!reset && navigation.goBack();
+			added && setAdded(false);
+			showRemovedModal && setShowRemovedModal(false);
+			warningPoints && setWarningPoints(false);
+			setReset(false);
+		}, 1500);
 	};
 
 	useEffect(() => {
 		createInitialTeam();
 	}, []);
 
-	useLayoutEffect(() => {
-		if (added || showRemovedModal || warningPoints)
-			setTimeout(() => {
-				added && setAdded(false);
-				showRemovedModal && setShowRemovedModal(false);
-				warningPoints && setWarningPoints(false);
-				navigation.goBack();
-				// removed && setRemoved(false);
-			}, 1500);
+	useEffect(() => {
+		if (added || showRemovedModal || warningPoints) resetHandle();
 	}, [added, showRemovedModal, warningPoints]);
 	return (
 		<View style={{ flex: 1 }}>
@@ -150,6 +172,10 @@ const PokemonView = ({ navigation, route }: Props) => {
 							)}
 						</View>
 					</TouchableOpacity>
+					<View style={{ marginTop: 60, right: -50, position: 'absolute' }}>
+						<Text style={{ fontSize: 19, fontWeight: '700', color: '#f0f7d3' }}>Team Points:</Text>
+						<Text style={{ fontSize: 23, fontWeight: '700', color: 'black', textAlign: 'center' }}>{teamPoints}</Text>
+					</View>
 				</View>
 				{(added || showRemovedModal || warningPoints) && <WaringModal {...{ added, points: warningPoints }} />}
 				<Image
@@ -164,9 +190,9 @@ const PokemonView = ({ navigation, route }: Props) => {
 					<ActivityIndicator color={color} size={50} />
 				</View>
 			) : (
-				<PokemonDetail pokemon={pokemonInformation} pokemonPoints={setSumPokemonPoints} />
+				<PokemonDetail pokemon={pokemonInformation} pokemonPoints={setPokemonPoints} />
 			)}
-			{/* <Text>{sumPokemonPoints}</Text> */}
+			{/* <Text>{pokemonPoints}</Text> */}
 		</View>
 	);
 };
